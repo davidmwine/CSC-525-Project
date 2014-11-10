@@ -14,7 +14,7 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 4.		Press Ctrl+F5					to EXECUTE
 ==================================================================================================*/
 
-#include "GL/glut.h"
+#include <iostream>
 #include "csc525Project.h";
 using namespace std;
 
@@ -26,6 +26,23 @@ int gameWidth;
 int gameHeight;
 int mainwindow;
 int gamewindow;
+int shipX = -10;
+int shipY = -264;
+
+void shipMove(int x, int y)
+{
+	int currX = (x - ((gameWidth/2))); //Convert to world coordinate system
+	int currY = ((gameHeight/2)) - y;
+	if (currX-20 >= -288 && currX+20 <= 288) //Check if current mouse pos within boundaries
+	{ //Mouse position based on center of ship
+		shipX = currX-10;
+	}
+	if (currY-25 >= -288 && currY+25 <= -192)
+	{
+		shipY = currY-25;
+	}
+	glutPostRedisplay();
+}
 
 void startGame(int button, int state, int x, int y)
 {
@@ -61,14 +78,14 @@ void startGame(int button, int state, int x, int y)
 
 
 		//Creating SubWindow where gameWidth/gameHeight is 75% of Viewable Screen Area.   
-		//Setting margin with gameWidth * 0.3 * 0.5, basically half of nonused size
-		gamewindow = glutCreateSubWindow(mainwindow, (int)(gameWidth * 0.3 *0.5), (int)(gameHeight * 0.28 * 0.5), gameWidth, gameHeight); //Create
+		//Setting margin with MainWidth * 0.25 * 0.5, basically half of nonused size
+		gamewindow = glutCreateSubWindow(mainwindow, (int)(MainWidth * 0.25 *0.5), 0, gameWidth, gameHeight); //Create
 
 		//INIT AND CALLBACK for GameScreen
 		myInit2();
 
 		glutDisplayFunc(myDisplayCallback2);		// register a callback
-
+		glutPassiveMotionFunc(shipMove); //Mouse movement moves ship
 
 		glutMainLoop();							// get into an infinite loop
 	}

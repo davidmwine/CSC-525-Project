@@ -13,13 +13,3 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
 4.		Press Ctrl+F5					to EXECUTE
 ==================================================================================================*/
-
-#include <GL/glut.h>
-
-void myDisplayCallback();
-void myDisplayCallback2();
-void backgroundCallback();
-void myInit();
-void myInit2();
-void backgroundmyInit();
-void shipMove(unsigned char key, int x, int y);

@@ -25,6 +25,7 @@ extern int gameWidth;
 extern int gameHeight;
 extern int splashId;
 extern int mouseButton;
+extern int shipX, shipY;
 double d;//initializing variable
 const double pi = 3.14159265; //pi constant
 size_t countup;

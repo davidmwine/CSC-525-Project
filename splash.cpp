@@ -76,47 +76,51 @@ int GetY(int ry, int r, double d, double pi) //Gets a y point from the center of
 	return y;
 }
 
-void displayShip(GLubyte shipStip[])
+void displayShip(GLubyte shipStip[], int startX = -10, int startY = -190)
 {
 	glEnable(GL_POLYGON_STIPPLE);
 	glPolygonStipple(shipStip); //Draw polygon with pattern
 	glBegin(GL_POLYGON);
 		glColor3f(0, 1, 0); //Draw ship
-		glVertex2i(-10, -190);
-		glVertex2i(10, -190);
-		glVertex2i(20, -160);
-		glVertex2i(0, -140);
-		glVertex2i(-20, -160);
+		glVertex2i(startX, startY);
+		glVertex2i(startX + 20, startY);
+		glVertex2i(startX + 30, startY + 30);
+		glVertex2i(startX + 10, startY + 50);
+		glVertex2i(startX - 10, startY + 30);
 	glEnd();
 	glDisable(GL_POLYGON_STIPPLE);//Draw ship cockpit
 	glBegin(GL_POLYGON);
 		glColor3f(0, 0, 0);
-		glVertex2i(-7, -165);
-		glVertex2i(0, -155);
-		glVertex2i(7, -165);
+		glVertex2i(startX + 3, startY + 25);
+		glVertex2i(startX + 10, startY + 35);
+		glVertex2i(startX + 17, startY + 25);
 	glEnd();
 	glBegin(GL_POLYGON); //Draw ships side guns
-		glVertex2i(-12, -170);
-		glVertex2i(-12, -160);
-		glVertex2i(-10, -155);
-		glVertex2i(-8, -160);
-		glVertex2i(-8, -170);
+		glVertex2i(startX - 2, startY + 20);
+		glVertex2i(startX - 2, startY + 30);
+		glVertex2i(startX, startY + 35);
+		glVertex2i(startX + 2, startY + 30);
+		glVertex2i(startX + 2, startY + 20);
 	glEnd();
 	glBegin(GL_POLYGON);
-		glVertex2i(12, -170);
-		glVertex2i(12, -160);
-		glVertex2i(10, -155);
-		glVertex2i(8, -160);
-		glVertex2i(8, -170);
+		glVertex2i(startX + 22, startY + 20);
+		glVertex2i(startX + 22, startY + 30);
+		glVertex2i(startX + 20, startY + 35);
+		glVertex2i(startX + 18, startY + 30);
+		glVertex2i(startX + 18, startY + 20);
 	glEnd();
+}
+
+void displayBullets()
+{
 	glLineWidth(1);
 	glBegin(GL_LINES); //Draw ships bullets
-		glColor3f(0, 1, 0);
-		for (int i = -135; i < 300; i += 10)
-		{
-			glVertex2i(0, i);
-			glVertex2i(0, i + 5);
-		}
+	glColor3f(0, 1, 0);
+	for (int i = -135; i < 300; i += 10)
+	{
+		glVertex2i(0, i);
+		glVertex2i(0, i + 5);
+	}
 	glEnd();
 }
 

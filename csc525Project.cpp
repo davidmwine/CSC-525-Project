@@ -22,21 +22,26 @@
 #include <stdio.h>
 #include <time.h>
 #include <sstream>
-#include "variables.h"
-#include "splash.h"
 #include "events.h"
+#include "game.h"
 using namespace std;
 
 //***********************************************************************************
 
-
 void splashScreen()
 {
 	displayShip(shipStip);
+	displayBullets();
 	displayImg(picture);
 	displayMushroom(mushroompattern);
 	displayCentipede(d, pi, countup);
 	displayText(xcor1, ycor1);
+}
+
+void playGame()
+{
+	Grid *g = new Grid();
+	Ship *s = new Ship(shipStip, shipX, shipY);
 }
 
 //***********************************************************************************
@@ -54,6 +59,7 @@ void myDisplayCallback()
 void myDisplayCallback2()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
+	playGame();
 	glFlush();
 }
 
@@ -61,8 +67,6 @@ void backgroundCallback()
 {
 
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
-	//glutFullScreen();
-	//drawPoints();
 
 	glFlush(); // flush out the buffer contents
 
@@ -71,17 +75,17 @@ void backgroundCallback()
 void myInit()
 {
 	glClearColor(0, 0, 0, 0);			// specify a background clor: white 
-	gluOrtho2D(-400, 400, -400, 400);  // specify a viewing area
+	gluOrtho2D(-375, 375, -375, 375);  // specify a viewing area
 }
 void myInit2()
 {
-	glClearColor(1, 1, 1, 0);			// specify a background clor: white 
-	gluOrtho2D(-400, 400, -400, 400);  // specify a viewing area
+	glClearColor(0.75, 0, 1, 0);			// specify a background clor: white 
+	gluOrtho2D(-300, 300, -300, 300);  // specify a viewing area
 }
 void backgroundmyInit()
 {
 	glClearColor(0, 0, 0, 0);			// specify a background color: white 
-	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);  // specify a viewing area
+	gluOrtho2D(-400, 400, -300, 300);  // specify a viewing area
 }
 
 //***********************************************************************************
