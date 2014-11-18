@@ -26,10 +26,13 @@ extern int gameHeight;
 extern int splashId;
 extern int mouseButton;
 extern int shipX, shipY;
+extern float bombX, bombY;
+extern bool bombShot;
 double d;//initializing variable
 const double pi = 3.14159265; //pi constant
 size_t countup;
 extern GLfloat picture[159][318][3]; //Centipede picture pixel map
+extern GLfloat bombPic[24][24][4]; //Bomb pixel map (transparent background)
 const GLfloat xcor1 = -130.0;
 const GLfloat ycor1 = 100.0;
 bool saved = false;

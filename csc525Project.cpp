@@ -1,17 +1,17 @@
 /*==================================================================================================
- PROGRAMMER:			David Wine, Joshua Stark
- COURSE:				CSC 525/625
- MODIFIED BY:			N/A
- LAST MODIFIED DATE:	Oct. 29, 2014
- DESCRIPTION:			Advertisement/Demo for game called Centipede Bomber
- NOTE:					N/A
- FILES:					csc525Project.cpp, splash.cpp, splash.h, variables.h
- IDE/COMPILER:			MicroSoft Visual Studio 2013
- INSTRUCTION FOR COMPILATION AND EXECUTION:
-	1.		Double click on hwProject.sln	to OPEN the project
-	2.		Press Ctrl+F7					to COMPILE
-	3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
-	4.		Press Ctrl+F5					to EXECUTE
+PROGRAMMER:			David Wine, Joshua Stark
+COURSE:				CSC 525/625
+MODIFIED BY:			N/A
+LAST MODIFIED DATE:	Oct. 29, 2014
+DESCRIPTION:			Advertisement/Demo for game called Centipede Bomber
+NOTE:					N/A
+FILES:					csc525Project.cpp, splash.cpp, splash.h, variables.h
+IDE/COMPILER:			MicroSoft Visual Studio 2013
+INSTRUCTION FOR COMPILATION AND EXECUTION:
+1.		Double click on hwProject.sln	to OPEN the project
+2.		Press Ctrl+F7					to COMPILE
+3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
+4.		Press Ctrl+F5					to EXECUTE
 ==================================================================================================*/
 #include <stdlib.h>
 #include <GL/glut.h>				// include GLUT library
@@ -25,6 +25,11 @@
 #include "events.h"
 #include "game.h"
 using namespace std;
+int MOP = -109;
+Grid *g = new Grid(-288, -288, 288, 288); //Display grid
+Bomb *b = new Bomb();
+Ship *s = new Ship(shipStip, shipX, shipY);
+Centipede *Cent = new Centipede();
 
 //***********************************************************************************
 
@@ -40,8 +45,15 @@ void splashScreen()
 
 void playGame()
 {
-	Grid *g = new Grid();
-	Ship *s = new Ship(shipStip, shipX, shipY);
+	g->drawGrid(); //Display grid
+	if (bombShot) //If there is a bomb on field, display it
+	{
+		b->drawBomb(bombX, bombY);
+		bombY++; //Change bombs location every time to simulate movement
+	}
+	s->redrawShip(shipStip, shipX, shipY); //Display ships current location
+	Cent->moveright(MOP, 277);
+	MOP++;
 }
 
 //***********************************************************************************
@@ -61,6 +73,7 @@ void myDisplayCallback2()
 	glClear(GL_COLOR_BUFFER_BIT);
 	playGame();
 	glFlush();
+	glutPostRedisplay(); //Run program in infinite loop
 }
 
 void backgroundCallback()
@@ -91,16 +104,17 @@ void backgroundmyInit()
 //***********************************************************************************
 void main(int argc, char ** argv)
 {
-	glutInit(& argc, argv);
+	glutInit(&argc, argv);
 
- glutInitWindowSize(750, 750);				// specify a window size
- glutInitWindowPosition(0, 0);			// specify a window position
- splashId = glutCreateWindow("CENTIPEDE");	// create a titled window
- openImg();
- myInit();									// setting up
+	glutInitWindowSize(750, 750);				// specify a window size
+	glutInitWindowPosition(0, 0);			// specify a window position
+	splashId = glutCreateWindow("CENTIPEDE");	// create a titled window
+	openImg();
+	openImg2();
+	myInit();									// setting up
 
- glutDisplayFunc(myDisplayCallback);		// register a callback
- glutMouseFunc(startGame);
- glutMainLoop();							// get into an infinite loop
- //glutLeaveGameMode();
+	glutDisplayFunc(myDisplayCallback);		// register a callback
+	glutMouseFunc(startGame);
+	glutMainLoop();							// get into an infinite loop
+	//glutLeaveGameMode();
 }
