@@ -22,3 +22,4 @@ void backgroundCallback();
 void myInit();
 void myInit2();
 void backgroundmyInit();
+void shipMove(unsigned char key, int x, int y);

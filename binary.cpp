@@ -29,7 +29,7 @@ string aStringObjectName = "CENTIPEDE";
 double d;//initializing variable
 const double pi = 3.14159265; //pi constant
 size_t countup;
-GLfloat picture[159][318][3]; //Centipede picture pixel map
+GLfloat picture[24][24][4]; //Centipede picture pixel map
 const GLfloat xcor1 = -70.0;
 const GLfloat ycor1 = 120.0;
 bool saved = false;
@@ -39,8 +39,8 @@ void main(int argc, char ** argv)
 {
 	ifstream file; //Create an ifstream to run through file
 	ofstream file2;
-	file.open("C:\\TEMP\\centipede.txt", ios::in | ios::binary);
-	file2.open("C:\\TEMP\\centipede.bin", ios::out | ios::binary);
+	file.open("C:\\TEMP\\bomb.txt", ios::in | ios::binary);
+	file2.open("C:\\TEMP\\bomb.bin", ios::out | ios::binary);
 
 	float readNum;
 	int i = 0; //Counter to determine where to place values in array
@@ -50,7 +50,7 @@ void main(int argc, char ** argv)
 	{//If file is open run loop
 		while (file >> readNum)
 		{ //Loop through all numbers in file
-			if (i < 512 * 3)
+			if (i < 24 * 4)
 			{
 				file2 << readNum << " ";
 			}
@@ -68,4 +68,5 @@ void main(int argc, char ** argv)
 		cout << "File not found. Make sure the file centipede.txt is in TEMP.\n";
 		exit(0);
 	}
+	file2.close();
 }

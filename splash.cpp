@@ -24,6 +24,7 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 using namespace std;
 
 GLfloat picture[159][318][3];
+GLfloat bombPic[24][24][4];
 
 void openImg()
 {
@@ -55,10 +56,45 @@ void openImg()
 	}
 	else
 	{//If file wasn't open display error message
-		cout << "File not found. Make sure the file centipede.txt is in TEMP.\n";
+		cout << "File not found. Make sure the file centipede.bin is in TEMP.\n";
+	}
+}
+
+void openImg2()
+{
+	ifstream file; //Create an ifstream to run through file
+	file.open("C:\\TEMP\\bomb.bin", ios::in | ios::binary);
+	float readNum;
+	int i = 0; //Counter to determine where to place values in array
+	int j = 0;
+	int color = 0;
+	if (file.is_open())
+	{//If file is open run loop
+		while (file >> readNum)
+		{ //Loop through all numbers in file
+			if (color == 4)
+			{
+				color = 0;
+				j++; //Increment counter
+			}
+			if (j == 24)
+			{
+				j = 0;
+				i++;
+			}
+			//std::cout << "i is: " << i << ", j is: " << j << std::endl;
+			bombPic[i][j][color] = readNum; //Insert pixel
+			color++;
+		}
+		file.close(); //Close file
+	}
+	else
+	{//If file wasn't open display error message
+		cout << "File not found. Make sure the file bomb.bin is in TEMP.\n";
 		exit(0);
 	}
 }
+
 
 int GetX(int rx, int r, double d, double pi) //Gets an x point from the center of a circle
 {
@@ -76,47 +112,51 @@ int GetY(int ry, int r, double d, double pi) //Gets a y point from the center of
 	return y;
 }
 
-void displayShip(GLubyte shipStip[])
+void displayShip(GLubyte shipStip[], int startX = -10, int startY = -190)
 {
 	glEnable(GL_POLYGON_STIPPLE);
 	glPolygonStipple(shipStip); //Draw polygon with pattern
 	glBegin(GL_POLYGON);
-		glColor3f(0, 1, 0); //Draw ship
-		glVertex2i(-10, -190);
-		glVertex2i(10, -190);
-		glVertex2i(20, -160);
-		glVertex2i(0, -140);
-		glVertex2i(-20, -160);
+	glColor3f(0, 1, 0); //Draw ship
+	glVertex2i(startX, startY);
+	glVertex2i(startX + 20, startY);
+	glVertex2i(startX + 30, startY + 30);
+	glVertex2i(startX + 10, startY + 50);
+	glVertex2i(startX - 10, startY + 30);
 	glEnd();
 	glDisable(GL_POLYGON_STIPPLE);//Draw ship cockpit
 	glBegin(GL_POLYGON);
-		glColor3f(0, 0, 0);
-		glVertex2i(-7, -165);
-		glVertex2i(0, -155);
-		glVertex2i(7, -165);
+	glColor3f(0, 0, 0);
+	glVertex2i(startX + 3, startY + 25);
+	glVertex2i(startX + 10, startY + 35);
+	glVertex2i(startX + 17, startY + 25);
 	glEnd();
 	glBegin(GL_POLYGON); //Draw ships side guns
-		glVertex2i(-12, -170);
-		glVertex2i(-12, -160);
-		glVertex2i(-10, -155);
-		glVertex2i(-8, -160);
-		glVertex2i(-8, -170);
+	glVertex2i(startX - 2, startY + 20);
+	glVertex2i(startX - 2, startY + 30);
+	glVertex2i(startX, startY + 35);
+	glVertex2i(startX + 2, startY + 30);
+	glVertex2i(startX + 2, startY + 20);
 	glEnd();
 	glBegin(GL_POLYGON);
-		glVertex2i(12, -170);
-		glVertex2i(12, -160);
-		glVertex2i(10, -155);
-		glVertex2i(8, -160);
-		glVertex2i(8, -170);
+	glVertex2i(startX + 22, startY + 20);
+	glVertex2i(startX + 22, startY + 30);
+	glVertex2i(startX + 20, startY + 35);
+	glVertex2i(startX + 18, startY + 30);
+	glVertex2i(startX + 18, startY + 20);
 	glEnd();
+}
+
+void displayBullets()
+{
 	glLineWidth(1);
 	glBegin(GL_LINES); //Draw ships bullets
-		glColor3f(0, 1, 0);
-		for (int i = -135; i < 300; i += 10)
-		{
-			glVertex2i(0, i);
-			glVertex2i(0, i + 5);
-		}
+	glColor3f(0, 1, 0);
+	for (int i = -135; i < 300; i += 10)
+	{
+		glVertex2i(0, i);
+		glVertex2i(0, i + 5);
+	}
 	glEnd();
 }
 
@@ -204,9 +244,9 @@ void displayCentipede(double d, double pi, size_t countup)
 				glLineStipple(1, 0xEEEE);
 				glBegin(GL_LINES);	// use the default point size: 1
 
-					/*SET  SECOND ENTRY FOR BIGGER CENTIPEDE BODY*/
-					glVertex2f(xnewrad, ynewrad); //Draws Body segments of centipede
-					glVertex2f(GetX(xnewrad, 40, t, pi), GetY(ynewrad, 40, t, pi));//Calls Circle function
+				/*SET  SECOND ENTRY FOR BIGGER CENTIPEDE BODY*/
+				glVertex2f(xnewrad, ynewrad); //Draws Body segments of centipede
+				glVertex2f(GetX(xnewrad, 40, t, pi), GetY(ynewrad, 40, t, pi));//Calls Circle function
 				glEnd();
 				glDisable(GL_LINE_STIPPLE);
 
@@ -219,16 +259,16 @@ void displayCentipede(double d, double pi, size_t countup)
 					glColor3f(0, 0.8, 0);	// change drawing color to green
 
 					glBegin(GL_LINES);	// use the default point size: 1			
-						if (t > pi)
-						{
-							glVertex2f(GetX(xnewrad, 40, distort, pi), GetY(ynewrad, 40, distort, pi));//Calls Circle function
-							glVertex2f(GetX(xnewrad, 40, distort, pi) - 20, GetY(ynewrad, 40, distort, pi) + 20);
-						}
-						else
-						{
-							glVertex2f(GetX(xnewrad, 40, distort, pi), GetY(ynewrad, 40, distort, pi));//Calls Circle function
-							glVertex2f(GetX(xnewrad, 40, distort, pi) + 20, GetY(ynewrad, 40, distort, pi) - 20);
-						}
+					if (t > pi)
+					{
+						glVertex2f(GetX(xnewrad, 40, distort, pi), GetY(ynewrad, 40, distort, pi));//Calls Circle function
+						glVertex2f(GetX(xnewrad, 40, distort, pi) - 20, GetY(ynewrad, 40, distort, pi) + 20);
+					}
+					else
+					{
+						glVertex2f(GetX(xnewrad, 40, distort, pi), GetY(ynewrad, 40, distort, pi));//Calls Circle function
+						glVertex2f(GetX(xnewrad, 40, distort, pi) + 20, GetY(ynewrad, 40, distort, pi) - 20);
+					}
 					glEnd();
 
 				}
@@ -253,10 +293,10 @@ void displayCentipede(double d, double pi, size_t countup)
 		float y = sinf(rad) * 10; //Find x and y based on radians and multiply by a constant
 		float x = cosf(rad) * 10;
 		glBegin(GL_LINES); //Draw eyes
-			glVertex2f(5, 340);
-			glVertex2f(x + 5, y + 340);
-			glVertex2f(5, 300);
-			glVertex2f(x + 5, y + 300);
+		glVertex2f(5, 340);
+		glVertex2f(x + 5, y + 340);
+		glVertex2f(5, 300);
+		glVertex2f(x + 5, y + 300);
 		glEnd();
 	}
 	for (int ang = 0; ang < 360; ang += 1) //Go through degrees
@@ -266,10 +306,10 @@ void displayCentipede(double d, double pi, size_t countup)
 		float y = sinf(rad) * 5; //Find x and y based on radians and multiply by a constant
 		float x = cosf(rad) * 5;
 		glBegin(GL_LINES); //Draw pupils of eyes
-			glVertex2f(5, 340);
-			glVertex2f(x + 5, y + 340);
-			glVertex2f(5, 300);
-			glVertex2f(x + 5, y + 300);
+		glVertex2f(5, 340);
+		glVertex2f(x + 5, y + 340);
+		glVertex2f(5, 300);
+		glVertex2f(x + 5, y + 300);
 		glEnd();
 	}
 }
