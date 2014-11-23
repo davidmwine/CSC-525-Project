@@ -22,14 +22,17 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 #include <stdio.h>
 #include <time.h>
 #include <sstream>
+#include <windows.h>
 #include "events.h"
 #include "game.h"
 using namespace std;
-int MOP = -109;
 Grid *g = new Grid(-288, -288, 288, 288); //Display grid
 Bomb *b = new Bomb();
 Ship *s = new Ship(shipStip, shipX, shipY);
 Centipede *Cent = new Centipede();
+mushrooms *mushmush = new mushrooms();
+int explode = 0;
+bool lost = false;
 
 //***********************************************************************************
 
@@ -45,15 +48,60 @@ void splashScreen()
 
 void playGame()
 {
-	g->drawGrid(); //Display grid
-	if (bombShot) //If there is a bomb on field, display it
+	if (!lost)
 	{
-		b->drawBomb(bombX, bombY);
-		bombY++; //Change bombs location every time to simulate movement
+		g->drawGrid(); //Display grid
+		mushmush->create();
+		if (bombShot) //If there is a bomb on field, display it
+		{
+			if (explode == 0)
+			{
+				b->drawBomb(bombX, bombY);
+			}
+			if (b->checkHit(Cent)) hit = true;
+			if (!hit) bombY++; //Change bombs location every time to simulate movement
+		}
+		s->drawShip(shipStip, shipX, shipY); //Display ships current location
+		bool popped = false;
+		if (!blown || !Cent->blowUp(bombX, bombY))
+		{
+			Cent->DrawTrue();
+			Cent->move(mushmush->getField());
+		}
+		else if (blown && Cent->blowUp(bombX, bombY))
+		{
+			Cent->DrawFalse();
+			popped = true;
+		}
+		glColor3f(1, 0.5, 1);
+		glRasterPos2i(-47, 48);
+		glBitmap(24, 24, 0.0, 0.0, 0.0, 0.0, mushroompattern2);
+
+		if (explode < 100 && blown)
+		{
+			glEnable(GL_BLEND); //Use GL_BLEND to enable transparency of bomb
+			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+			glRasterPos2i(bombX - 24, bombY - 24); //Starting point of centipede image
+			glDrawPixels(72, 72, GL_RGBA, GL_FLOAT, explosionPic); //Draw centipede image
+			glDisable(GL_BLEND);
+			explode++;
+		}
+		else
+		{
+			blown = false;
+			explode = 0;
+			if (popped)
+			{
+				Cent->popSeg();
+			}
+		}
+		if (s->centColl(Cent)) lost = true;
 	}
-	s->redrawShip(shipStip, shipX, shipY); //Display ships current location
-	Cent->moveright(MOP, 277);
-	MOP++;
+	else
+	{
+		displayLoss();
+	}
+	
 }
 
 //***********************************************************************************
@@ -65,14 +113,17 @@ void myDisplayCallback()
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
 
 	splashScreen();
-	glFlush(); // flush out the buffer contents
+	//glFlush();
+	glutSwapBuffers(); // flush out the buffer contents
 }
 
 void myDisplayCallback2()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	playGame();
-	glFlush();
+	//glFlush();
+	glutSwapBuffers();
+	Sleep(1);
 	glutPostRedisplay(); //Run program in infinite loop
 }
 
@@ -81,7 +132,7 @@ void backgroundCallback()
 
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
 
-	glFlush(); // flush out the buffer contents
+	glutSwapBuffers(); // flush out the buffer contents
 
 }
 
@@ -92,7 +143,8 @@ void myInit()
 }
 void myInit2()
 {
-	glClearColor(0.75, 0, 1, 0);			// specify a background clor: white 
+	glClearColor(0.0, 0.0, 0.5, 1);
+	//glClearColor(0.75, 0, 1, 0);			// specify a background clor: white 
 	gluOrtho2D(-300, 300, -300, 300);  // specify a viewing area
 }
 void backgroundmyInit()
@@ -108,9 +160,11 @@ void main(int argc, char ** argv)
 
 	glutInitWindowSize(750, 750);				// specify a window size
 	glutInitWindowPosition(0, 0);			// specify a window position
+	glutInitDisplayMode(GLUT_DOUBLE);  //DOUBLE BUFFER
 	splashId = glutCreateWindow("CENTIPEDE");	// create a titled window
 	openImg();
 	openImg2();
+	openImg3();
 	myInit();									// setting up
 
 	glutDisplayFunc(myDisplayCallback);		// register a callback

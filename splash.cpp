@@ -25,6 +25,7 @@ using namespace std;
 
 GLfloat picture[159][318][3];
 GLfloat bombPic[24][24][4];
+GLfloat explosionPic[72][72][4];
 
 void openImg()
 {
@@ -95,6 +96,41 @@ void openImg2()
 	}
 }
 
+void openImg3()
+{
+	ifstream file; //Create an ifstream to run through file
+	file.open("C:\\TEMP\\explosion.bin", ios::in | ios::binary);
+	float readNum;
+	int i = 0; //Counter to determine where to place values in array
+	int j = 0;
+	int color = 0;
+	if (file.is_open())
+	{//If file is open run loop
+		while (file >> readNum)
+		{ //Loop through all numbers in file
+			if (color == 4)
+			{
+				color = 0;
+				j++; //Increment counter
+			}
+			if (j == 72)
+			{
+				j = 0;
+				i++;
+			}
+			//std::cout << "i is: " << i << ", j is: " << j << std::endl;
+			explosionPic[i][j][color] = readNum; //Insert pixel
+			color++;
+		}
+		file.close(); //Close file
+	}
+	else
+	{//If file wasn't open display error message
+		cout << "File not found. Make sure the file explosion.bin is in TEMP.\n";
+		exit(0);
+	}
+}
+
 
 int GetX(int rx, int r, double d, double pi) //Gets an x point from the center of a circle
 {
@@ -112,10 +148,10 @@ int GetY(int ry, int r, double d, double pi) //Gets a y point from the center of
 	return y;
 }
 
-void displayShip(GLubyte shipStip[], int startX = -10, int startY = -190)
+void displayShip(GLubyte ship[], int startX = -10, int startY = -190)
 {
 	glEnable(GL_POLYGON_STIPPLE);
-	glPolygonStipple(shipStip); //Draw polygon with pattern
+	glPolygonStipple(ship); //Draw polygon with pattern
 	glBegin(GL_POLYGON);
 	glColor3f(0, 1, 0); //Draw ship
 	glVertex2i(startX, startY);
@@ -320,7 +356,6 @@ void displayText(GLfloat xcor1, GLfloat ycor1)
 	glRasterPos2i(xcor1, ycor1);
 	int g = xcor1;
 	GLint yposition = ycor1;
-	bool flag = true;
 	string strt = "CLICK TO START";
 	for (int i = 0; i < strt.length(); i++)
 	{ //Display click to start text

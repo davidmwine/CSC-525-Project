@@ -31,18 +31,20 @@ int shipY = -264;
 float bombX;
 float bombY;
 bool bombShot = false;
+bool hit = false;
+bool blown = false;
 
 void shipMove(int x, int y)
 {
 	int currX = (x - ((gameWidth / 2))); //Convert to world coordinate system
 	int currY = ((gameHeight / 2)) - y;
-	if (currX - 20 >= -288 && currX + 20 <= 288) //Check if current mouse pos within boundaries
+	if (currX - 15 >= -288 && currX + 15 <= 288) //Check if current mouse pos within boundaries
 	{ //Mouse position based on center of ship
 		shipX = currX - 10;
 	}
-	if (currY - 25 >= -288 && currY + 25 <= -192)
+	if (currY - 20 >= -288 && currY + 20 <= -192)
 	{
-		shipY = currY - 25;
+		shipY = currY - 20;
 	}
 	glutPostRedisplay();
 }
@@ -54,6 +56,12 @@ void shoot(int button, int state, int x, int y)
 		bombX = shipX + 3; //Set bombs starting location
 		bombY = shipY + 13;
 		bombShot = true; //Set boolean to know tht a bomb was shot
+	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && bombShot && hit)
+	{
+		hit = false;
+		blown = true;
+		bombShot = false;
 	}
 	glFlush();
 }

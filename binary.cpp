@@ -29,7 +29,7 @@ string aStringObjectName = "CENTIPEDE";
 double d;//initializing variable
 const double pi = 3.14159265; //pi constant
 size_t countup;
-GLfloat picture[24][24][4]; //Centipede picture pixel map
+GLfloat picture[72][72][4]; //Centipede picture pixel map
 const GLfloat xcor1 = -70.0;
 const GLfloat ycor1 = 120.0;
 bool saved = false;
@@ -39,8 +39,8 @@ void main(int argc, char ** argv)
 {
 	ifstream file; //Create an ifstream to run through file
 	ofstream file2;
-	file.open("C:\\TEMP\\bomb.txt", ios::in | ios::binary);
-	file2.open("C:\\TEMP\\bomb.bin", ios::out | ios::binary);
+	file.open("C:\\TEMP\\explosion.txt", ios::in | ios::binary);
+	file2.open("C:\\TEMP\\explosion.bin", ios::out | ios::binary);
 
 	float readNum;
 	int i = 0; //Counter to determine where to place values in array
