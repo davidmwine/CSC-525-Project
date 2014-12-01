@@ -15,6 +15,7 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 ==================================================================================================*/
 
 #include <GL/glut.h>
+#include <time.h>
 using namespace std;
 
 extern int mainwindow;
@@ -32,6 +33,7 @@ extern bool hit;
 extern bool blown;
 extern int explode;
 extern bool lost;
+extern clock_t timer;
 double d;//initializing variable
 const double pi = 3.14159265; //pi constant
 size_t countup;
