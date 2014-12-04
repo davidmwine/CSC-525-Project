@@ -16,6 +16,7 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 
 #include <iostream>
 #include "csc525Project.h";
+#include <time.h>
 using namespace std;
 
 int mouseButton;
@@ -33,6 +34,7 @@ float bombY;
 bool bombShot = false;
 bool hit = false;
 bool blown = false;
+clock_t timer = 0;
 
 void shipMove(int x, int y)
 {
@@ -57,13 +59,21 @@ void shoot(int button, int state, int x, int y)
 		bombY = shipY + 13;
 		bombShot = true; //Set boolean to know tht a bomb was shot
 	}
-	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && bombShot && hit)
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && bombShot)
 	{
 		hit = false;
 		blown = true;
 		bombShot = false;
 	}
 	glFlush();
+}
+
+void idle()
+{
+	if (clock() > timer + 3)
+	{
+		glutPostRedisplay();
+	}
 }
 
 void startGame(int button, int state, int x, int y)
@@ -109,6 +119,7 @@ void startGame(int button, int state, int x, int y)
 		glutDisplayFunc(myDisplayCallback2);		// register a callback
 		glutPassiveMotionFunc(shipMove); //Mouse movement moves ship
 		glutMouseFunc(shoot); //Left click shoots bomb
+		glutIdleFunc(idle);
 		glutMainLoop();							// get into an infinite loop
 	}
 	glFlush();
