@@ -25,151 +25,6 @@ struct flocations
 	double mY;
 	bool used;
 };
-class mushrooms
-{
-private:
-	vector<flocations*> field;
-
-public:
-	mushrooms(double minX = -240, double minY = -192, double maxX = 240, double maxY = 240)
-	{
-
-		srand(time(NULL));
-		bool t = false;
-		bool gVal = false;
-		unsigned int Fsize;
-
-		flocations *first = new flocations();
-		first->mX = 216;
-		first->mY = 96;
-
-		field.push_back(first);
-
-
-		for (int y = minY; y <= maxY; y += 24)
-		{
-
-			Fsize = field.size();
-
-
-			for (int x = 0; x < 2; x++)
-			{
-
-				double rFactor = (rand() % 10) * 24;
-				flocations *ty = new flocations();
-				if (t)
-				{
-					ty->mX = rFactor;
-					t = false;
-				}
-				else
-				{
-					ty->mX = -rFactor;
-					t = true;
-				}
-				ty->mY = y;
-
-
-
-				for (unsigned int u = 0; u < Fsize; ++u)
-				{
-					if (ty->mX - 24 == (field[u]->mX) && ty->mY - 24 == (field[u]->mY)\
-						|| ty->mX + 24 == (field[u]->mX) && ty->mY - 24 == (field[u]->mY)\
-						|| ty->mX - 24 == (field[u]->mX) && ty->mY + 24 == (field[u]->mY)\
-						|| ty->mX + 24 == (field[u]->mX) && ty->mY + 24 == (field[u]->mY))
-					{
-
-						gVal = true;
-
-
-					}
-
-
-
-				}
-
-				if (!gVal)
-					field.push_back(ty);
-
-				gVal = false;
-
-
-			}
-		}
-
-
-	}
-	void create()
-	{
-		for (unsigned int i = 0; i < field.size(); ++i)
-		{
-			draw(field[i]->mX, field[i]->mY);
-		}
-	}
-
-	void draw(double x, double y)
-	{
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glColor3f(1, 0.5, 1);
-		glRasterPos2i(x, y);
-		glBitmap(24, 24, 0.0, 0.0, 0.0, 0.0, mushroompattern2);
-	}
-	vector<flocations*> getField()
-	{
-		return field;
-	}
-
-	bool blowUp(int x, int y)
-	{
-		bool result = false;
-		for (int i = 0; i < field.size(); i++)
-		{
-			int mX = field[i]->mX;
-			int mY = field[i]->mY;
-			if ((mX < x + 48 && mX > x - 24)\
-				|| mX + 24 < x + 48 && mX + 24 > x - 24)
-			{
-				if ((mY < y + 48 && mY > y - 24)\
-					|| (mY + 24 < y + 48 && mY + 24 > y - 24))
-				{
-					result = true;
-				}
-			}
-		}
-		return result;
-	}
-
-	void destroyMush(int x, int y)
-	{
-		for (int i = 0; i < field.size(); i++)
-		{
-			int mX = field[i]->mX;
-			int mY = field[i]->mY;
-			if ((mX < x + 48 && mX > x - 24)\
-				|| mX + 24 < x + 48 && mX + 24 > x - 24)
-			{
-				if ((mY < y + 48 && mY > y - 24)\
-					|| (mY + 24 < y + 48 && mY + 24 > y - 24))
-				{
-					field.erase(field.begin() + i);
-				}
-			}
-		}
-	}
-
-	int getX(int i)
-	{
-		return field[i]->mX;
-	}
-
-	int getY(int i)
-	{
-		return field[i]->mY;
-	}
-
-
-
-};
 
 //Segments Class
 class Segments
@@ -671,32 +526,102 @@ public:
 		return result;
 	}
 
-	bool checkHit2(mushrooms *m)
+
+};
+class mushrooms
+{
+private:
+	vector<flocations*> field;
+
+public:
+	mushrooms(double minX = -240, double minY = -192, double maxX = 240, double maxY = 240)
 	{
-		bool result = false;
-		for (int i = 0; i < m->getField().size(); i++)
+
+		srand(time(NULL));
+		bool t = false;
+		bool gVal = false;
+		unsigned int Fsize;
+
+		flocations *first = new flocations();
+		first->mX = 216;
+		first->mY = 96;
+
+		field.push_back(first);
+
+
+		for (int y = minY; y <= maxY; y += 24)
 		{
-			int mX = m->getX(i);
-			int mY = m->getY(i);
-			if ((mX < xLoc + 24 && mX > xLoc)\
-				|| mX + 24 < xLoc + 24 && mX + 24 > xLoc)
+
+			Fsize = field.size();
+
+
+			for (int x = 0; x < 2; x++)
 			{
-				if ((mY < yLoc + 24 && mY > yLoc)\
-					|| (mY + 24 < yLoc + 24 && mY + 24 > yLoc))
+
+				double rFactor = (rand() % 10) * 24;
+				flocations *ty = new flocations();
+				if (t)
 				{
-					result = true;
+					ty->mX = rFactor;
+					t = false;
 				}
+				else
+				{
+					ty->mX = -rFactor;
+					t = true;
+				}
+				ty->mY = y;
+
+
+
+				for (unsigned int u = 0; u < Fsize; ++u)
+				{
+					if (ty->mX - 24 == (field[u]->mX) && ty->mY - 24 == (field[u]->mY)\
+						|| ty->mX + 24 == (field[u]->mX) && ty->mY - 24 == (field[u]->mY)\
+						|| ty->mX - 24 == (field[u]->mX) && ty->mY + 24 == (field[u]->mY)\
+						|| ty->mX + 24 == (field[u]->mX) && ty->mY + 24 == (field[u]->mY))
+					{
+
+						gVal = true;
+
+
+					}
+
+
+
+				}
+
+				if (!gVal)
+					field.push_back(ty);
+
+				gVal = false;
+
+
 			}
 		}
-		return result;
+
+
+	}
+	void create()
+	{
+		for (unsigned int i = 0; i < field.size(); ++i)
+		{
+			draw(field[i]->mX, field[i]->mY);
+		}
 	}
 
-	void explosion()
+	void draw(double x, double y)
 	{
-		glEnable(GL_BLEND); //Use GL_BLEND to enable transparency of bomb
-		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-		glRasterPos2i(bombX - 24, bombY - 24); //Starting point of centipede image
-		glDrawPixels(72, 72, GL_RGBA, GL_FLOAT, explosionPic); //Draw centipede image
-		glDisable(GL_BLEND);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glColor3f(1, 0.5, 1);
+		glRasterPos2i(x, y);
+		glBitmap(24, 24, 0.0, 0.0, 0.0, 0.0, mushroompattern2);
 	}
+	vector<flocations*> getField()
+	{
+		return field;
+	}
+
+
+
 };

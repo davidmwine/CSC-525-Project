@@ -48,7 +48,6 @@ void splashScreen()
 
 void playGame()
 {
-	lost = true;
 	if (!lost)
 	{
 		g->drawGrid(); //Display grid
@@ -59,12 +58,11 @@ void playGame()
 			{
 				b->drawBomb(bombX, bombY);
 			}
-			if (b->checkHit(Cent) || b->checkHit2(mushmush)) hit = true;
+			if (b->checkHit(Cent)) hit = true;
 			if (!hit) bombY++; //Change bombs location every time to simulate movement
 		}
 		s->drawShip(shipStip, shipX, shipY); //Display ships current location
 		bool popped = false;
-		bool mushDest = false;
 		if (!blown || !Cent->blowUp(bombX, bombY))
 		{
 			Cent->DrawTrue();
@@ -75,14 +73,17 @@ void playGame()
 			Cent->DrawFalse();
 			popped = true;
 		}
-		if (blown && mushmush->blowUp(bombX, bombY))
-		{
-			mushDest = true;
-		}
+		glColor3f(1, 0.5, 1);
+		glRasterPos2i(-47, 48);
+		glBitmap(24, 24, 0.0, 0.0, 0.0, 0.0, mushroompattern2);
 
 		if (explode < 100 && blown)
 		{
-			b->explosion();
+			glEnable(GL_BLEND); //Use GL_BLEND to enable transparency of bomb
+			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+			glRasterPos2i(bombX - 24, bombY - 24); //Starting point of centipede image
+			glDrawPixels(72, 72, GL_RGBA, GL_FLOAT, explosionPic); //Draw centipede image
+			glDisable(GL_BLEND);
 			explode++;
 		}
 		else
@@ -92,10 +93,6 @@ void playGame()
 			if (popped)
 			{
 				Cent->popSeg();
-			}
-			if (mushDest)
-			{
-				mushmush->destroyMush(bombX, bombY);
 			}
 		}
 		if (s->centColl(Cent)) lost = true;
@@ -114,6 +111,7 @@ void myDisplayCallback()
 {
 	//glutFullScreen();
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
+
 	splashScreen();
 	//glFlush();
 	glutSwapBuffers(); // flush out the buffer contents
@@ -121,13 +119,12 @@ void myDisplayCallback()
 
 void myDisplayCallback2()
 {
-	timer = clock();
 	glClear(GL_COLOR_BUFFER_BIT);
 	playGame();
 	//glFlush();
 	glutSwapBuffers();
-	//Sleep(3);
-	//glutPostRedisplay(); //Run program in infinite loop
+	Sleep(1);
+	glutPostRedisplay(); //Run program in infinite loop
 }
 
 void backgroundCallback()
