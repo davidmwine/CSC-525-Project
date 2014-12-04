@@ -29,10 +29,8 @@ using namespace std;
 Grid *g = new Grid(-288, -288, 288, 288); //Display grid
 Bomb *b = new Bomb();
 Ship *s = new Ship(shipStip, shipX, shipY);
-Centipede *Cent = new Centipede();
+Centipede *Cent = new Centipede(segmentNum);
 mushrooms *mushmush = new mushrooms();
-int explode = 0;
-bool lost = false;
 
 //***********************************************************************************
 
@@ -48,8 +46,15 @@ void splashScreen()
 
 void playGame()
 {
-	lost = true;
-	if (!lost)
+	if (reset)
+	{
+		g = new Grid(-288, -288, 288, 288); //Display grid
+		Cent = new Centipede(segmentNum);
+		mushmush = new mushrooms();
+		reset = false;
+	}
+	//lost = true;
+	if (!lost && !won)
 	{
 		g->drawGrid(); //Display grid
 		mushmush->create();
@@ -85,7 +90,7 @@ void playGame()
 			b->explosion();
 			explode++;
 		}
-		else
+		else if (blown)
 		{
 			blown = false;
 			explode = 0;
@@ -97,12 +102,32 @@ void playGame()
 			{
 				mushmush->destroyMush(bombX, bombY);
 			}
+			if (b->killed(shipX, shipY))
+			{
+				lost = true;
+			}
 		}
 		if (s->centColl(Cent)) lost = true;
+		if (Cent->getSize() == 0)
+		{
+			won = true;
+			winNum++;
+		}
+	}
+	else if (lost)
+	{
+		displayLoss(skullPic);
 	}
 	else
 	{
-		displayLoss();
+		if (winNum < 3)
+		{
+			displayWin();
+		}
+		else
+		{
+			displayFinish();
+		}
 	}
 	
 }
@@ -168,6 +193,7 @@ void main(int argc, char ** argv)
 	openImg();
 	openImg2();
 	openImg3();
+	openImg4();
 	myInit();									// setting up
 
 	glutDisplayFunc(myDisplayCallback);		// register a callback

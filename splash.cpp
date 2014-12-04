@@ -26,6 +26,7 @@ using namespace std;
 GLfloat picture[159][318][3];
 GLfloat bombPic[24][24][4];
 GLfloat explosionPic[72][72][4];
+GLfloat skullPic[300][300][4];
 
 void openImg()
 {
@@ -120,6 +121,41 @@ void openImg3()
 			}
 			//std::cout << "i is: " << i << ", j is: " << j << std::endl;
 			explosionPic[i][j][color] = readNum; //Insert pixel
+			color++;
+		}
+		file.close(); //Close file
+	}
+	else
+	{//If file wasn't open display error message
+		cout << "File not found. Make sure the file explosion.bin is in TEMP.\n";
+		exit(0);
+	}
+}
+
+void openImg4()
+{
+	ifstream file; //Create an ifstream to run through file
+	file.open("C:\\TEMP\\8bitskull.bin", ios::in | ios::binary);
+	float readNum;
+	int i = 0; //Counter to determine where to place values in array
+	int j = 0;
+	int color = 0;
+	if (file.is_open())
+	{//If file is open run loop
+		while (file >> readNum)
+		{ //Loop through all numbers in file
+			if (color == 4)
+			{
+				color = 0;
+				j++; //Increment counter
+			}
+			if (j == 300)
+			{
+				j = 0;
+				i++;
+			}
+			//std::cout << "i is: " << i << ", j is: " << j << std::endl;
+			skullPic[i][j][color] = readNum; //Insert pixel
 			color++;
 		}
 		file.close(); //Close file

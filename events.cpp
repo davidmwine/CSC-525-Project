@@ -34,6 +34,12 @@ float bombY;
 bool bombShot = false;
 bool hit = false;
 bool blown = false;
+int explode = 0;
+int segmentNum = 50;
+int winNum = 0;
+bool lost = false;
+bool won = false;
+bool reset = false;
 clock_t timer = 0;
 
 void shipMove(int x, int y)
@@ -51,19 +57,30 @@ void shipMove(int x, int y)
 	glutPostRedisplay();
 }
 
-void shoot(int button, int state, int x, int y)
+void mouseClick(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && !bombShot)
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && !bombShot && explode == 0 && !lost && !won)
 	{ //If player shot bomb and bomb not already on field
 		bombX = shipX + 3; //Set bombs starting location
 		bombY = shipY + 13;
 		bombShot = true; //Set boolean to know tht a bomb was shot
 	}
-	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && bombShot)
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && bombShot && !lost && !won)
 	{
 		hit = false;
 		blown = true;
 		bombShot = false;
+	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && lost)
+	{
+		lost = false;
+		reset = true;
+	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && won && winNum <= 3)
+	{
+		won = false;
+		reset = true;
+		segmentNum -= 20;
 	}
 	glFlush();
 }
@@ -118,7 +135,7 @@ void startGame(int button, int state, int x, int y)
 
 		glutDisplayFunc(myDisplayCallback2);		// register a callback
 		glutPassiveMotionFunc(shipMove); //Mouse movement moves ship
-		glutMouseFunc(shoot); //Left click shoots bomb
+		glutMouseFunc(mouseClick); //Left click shoots bomb
 		glutIdleFunc(idle);
 		glutMainLoop();							// get into an infinite loop
 	}

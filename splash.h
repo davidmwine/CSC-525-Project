@@ -20,6 +20,7 @@ using namespace std;
 void openImg();
 void openImg2();
 void openImg3();
+void openImg4();
 int GetX(int rx, int r, double d, double pi);
 int GetY(int ry, int r, double d, double pi);
 void displayShip(GLubyte shipStip[], int startX = -10, int startY = -190);

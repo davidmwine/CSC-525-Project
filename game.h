@@ -17,7 +17,9 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 #include "variables.h"
 #include <vector>
 
-void displayLoss();
+void displayLoss(GLfloat pixMap[][300][4]);
+void displayWin();
+void displayFinish();
 
 struct flocations
 {
@@ -183,10 +185,12 @@ private:
 	bool DrawDisplay;
 	bool MoveLeft;
 	int linelocation;
+	int segNum;
 public:
-	Segments(double x, double y) {
+	Segments(double x, double y, int segs) {
 		minxlocation = x;
 		minylocation = y;
+		segNum = segs;
 		DrawDisplay = false;
 		MoveLeft = false;
 		linelocation = 0;
@@ -199,7 +203,7 @@ public:
 			
 			//glLineWidth(6);
 			glColor3f(0, 0.8, 0);
-			DrawCircle(minxlocation, minylocation, r, 50);
+			DrawCircle(minxlocation, minylocation, r, segNum);
 			//glBegin(GL_LINES); // use the default point size: 1
 			//for (double t = 0; t <= 2 * pi; t += 0.005) //Incrementing slowly around Radius
 			//{
@@ -310,15 +314,17 @@ private:
 	int NumOfSegments;
 	bool ToDraw;
 	bool done;
+	int segNum;
 	/*Need to Implement a body counter for bomb destruction*/
 public:
-	Centipede(double startX = -85, double startY = 277){
+	Centipede(int segs = 50, double startX = -85, double startY = 277){
 		NumOfSegments = 8;
 		ToDraw = false;
 		done = false;
+		segNum = segs;
 		for (int i = 0; i < NumOfSegments; i++)
 		{
-			Segments *Y = new Segments(startX, startY);
+			Segments *Y = new Segments(startX, startY, segNum);
 			body.push_back(Y);
 			startX = startX - 23;
 
@@ -580,6 +586,8 @@ public:
 	}
 	void drawShip(GLubyte ship[], int startX, int startY)
 	{
+		xLoc = startX;
+		yLoc = startY;
 		glEnable(GL_POLYGON_STIPPLE);
 		glPolygonStipple(ship); //Draw polygon with pattern
 		glBegin(GL_POLYGON);
@@ -605,11 +613,11 @@ public:
 		{
 			int cX = c->getSegX(i);
 			int cY = c->getSegY(i);
-			if ((cX - 12 < shipX + 25 && cX - 12 > shipX - 5)\
-				|| cX + 12 < shipX + 25 && cX + 12 > shipX - 5)
+			if ((cX - 12 < xLoc + 25 && cX - 12 > xLoc - 5)\
+				|| cX + 12 < xLoc + 25 && cX + 12 > xLoc - 5)
 			{
-				if ((cY - 12 < shipY + 40 && cY - 12 > shipY)\
-					|| (cY + 12 < shipY + 40 && cY + 12 > shipY))
+				if ((cY - 12 < yLoc + 40 && cY - 12 > yLoc)\
+					|| (cY + 12 < yLoc + 40 && cY + 12 > yLoc))
 				{
 					result = true;
 				}
@@ -686,6 +694,21 @@ public:
 				{
 					result = true;
 				}
+			}
+		}
+		return result;
+	}
+
+	bool killed(int sX, int sY)
+	{
+		bool result = false;
+		if ((sX - 5 > xLoc - 24 && sX + 25 < xLoc + 48)\
+			|| (sX - 5 > xLoc - 24 && sX + 25 + 12 < xLoc + 48))
+		{
+			if ((sY + 40 > yLoc - 24 && sY + 40 < yLoc + 48)\
+				|| (sY > yLoc - 24 && sY + 12 < yLoc + 48))
+			{
+				result = true;
 			}
 		}
 		return result;
