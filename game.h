@@ -441,7 +441,7 @@ public:
 		}
 		ut->IncLineLocation();
 		ut->SetMLeft();
-		ut->moveSegment(2, 0);
+		//ut->moveSegment(0, 0);
 	}
 	bool CollisionDetector(vector<flocations*> mushloc, Segments* ut)
 	{
@@ -457,9 +457,9 @@ public:
 			{
 				for (auto mush : mushloc)
 				{
-					if (mush->mX + 12 > ut->centerX() - 12 && mush->mX - 12 < ut->centerX() - 12)
+					if (mush->mX + 24 >= ut->centerX() - 12 && mush->mX <= ut->centerX() - 12)
 					{
-						if (mush->mY + 12 > ut->centerY() - 12 && mush->mY - 12 < ut->centerY() - 12)
+						if (mush->mY + 24 > ut->centerY() && mush->mY < ut->centerY())
 						{
 							set = true;
 						}
@@ -479,9 +479,9 @@ public:
 				for (auto mush : mushloc)
 				{
 					//11.8 12.2
-					if (mush->mX - 12 < ut->centerX() + 12 && mush->mX + 12 > ut->centerX() + 12)
+					if (mush->mX <= ut->centerX() + 12 && mush->mX + 24 >= ut->centerX() + 12)
 					{
-						if (mush->mY - 12 < ut->centerY() - 12 && mush->mY + 12 > ut->centerY() - 12)
+						if (mush->mY +24 > ut->centerY() && mush->mY < ut->centerY())
 						{
 							set = true;
 						}

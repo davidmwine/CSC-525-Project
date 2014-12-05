@@ -48,9 +48,15 @@ void playGame()
 {
 	if (reset)
 	{
+		cout << winNum << " " << segmentNum << endl;
 		g = new Grid(-288, -288, 288, 288); //Display grid
 		Cent = new Centipede(segmentNum);
 		mushmush = new mushrooms();
+		b = new Bomb();
+		bombShot = false;
+		hit = false;
+		blown = false;
+		explode = 0;
 		reset = false;
 	}
 	//lost = true;
@@ -65,7 +71,7 @@ void playGame()
 				b->drawBomb(bombX, bombY);
 			}
 			if (b->checkHit(Cent) || b->checkHit2(mushmush)) hit = true;
-			if (!hit) bombY++; //Change bombs location every time to simulate movement
+			if (!hit) bombY+=2; //Change bombs location every time to simulate movement
 		}
 		s->drawShip(shipStip, shipX, shipY); //Display ships current location
 		bool popped = false;
@@ -116,16 +122,20 @@ void playGame()
 	}
 	else if (lost)
 	{
+		winNum = 0;
+		segmentNum = 50;
 		displayLoss(skullPic);
 	}
 	else
 	{
-		if (winNum < 3)
+		if (winNum <= 3)
 		{
 			displayWin();
 		}
 		else
 		{
+			//winNum = 0;
+			//segmentNum = 50;
 			displayFinish();
 		}
 	}
@@ -151,8 +161,8 @@ void myDisplayCallback2()
 	playGame();
 	//glFlush();
 	glutSwapBuffers();
-	//Sleep(3);
-	//glutPostRedisplay(); //Run program in infinite loop
+	//Sleep(1);
+	glutPostRedisplay(); //Run program in infinite loop
 }
 
 void backgroundCallback()

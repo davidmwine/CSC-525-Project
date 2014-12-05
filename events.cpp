@@ -74,24 +74,26 @@ void mouseClick(int button, int state, int x, int y)
 	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && lost)
 	{
 		lost = false;
+		won = false;
 		reset = true;
 	}
 	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && won && winNum <= 3)
 	{
 		won = false;
+		lost = false;
 		reset = true;
 		segmentNum -= 20;
 	}
 	glFlush();
 }
 
-void idle()
+/*void idle()
 {
 	if (clock() > timer + 3)
 	{
 		glutPostRedisplay();
 	}
-}
+}*/
 
 void startGame(int button, int state, int x, int y)
 {
@@ -136,7 +138,7 @@ void startGame(int button, int state, int x, int y)
 		glutDisplayFunc(myDisplayCallback2);		// register a callback
 		glutPassiveMotionFunc(shipMove); //Mouse movement moves ship
 		glutMouseFunc(mouseClick); //Left click shoots bomb
-		glutIdleFunc(idle);
+		//glutIdleFunc(idle);
 		glutMainLoop();							// get into an infinite loop
 	}
 	glFlush();
