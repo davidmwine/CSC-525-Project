@@ -40,6 +40,8 @@ int winNum = 0;
 bool lost = false;
 bool won = false;
 bool reset = false;
+bool started = false;
+bool paused = false;
 clock_t timer = 0;
 
 void shipMove(int x, int y)
@@ -50,7 +52,7 @@ void shipMove(int x, int y)
 	{ //Mouse position based on center of ship
 		shipX = currX - 10;
 	}
-	if (currY - 20 >= -288 && currY + 20 <= -192)
+	if (currY - 20 >= -288 && currY + 20 <= -216)
 	{
 		shipY = currY - 20;
 	}
@@ -59,7 +61,12 @@ void shipMove(int x, int y)
 
 void mouseClick(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && !bombShot && explode == 0 && !lost && !won)
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && !started)
+	{
+		started = true;
+		glClearColor(0.15, 0.15, 0.15, 1);
+	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && !bombShot && explode == 0 && !lost && !won)
 	{ //If player shot bomb and bomb not already on field
 		bombX = shipX + 3; //Set bombs starting location
 		bombY = shipY + 13;
@@ -76,6 +83,7 @@ void mouseClick(int button, int state, int x, int y)
 		lost = false;
 		won = false;
 		reset = true;
+		glClearColor(0.0, 0.0, 0.2, 1);
 	}
 	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && won && winNum <= 3)
 	{
@@ -83,8 +91,39 @@ void mouseClick(int button, int state, int x, int y)
 		lost = false;
 		reset = true;
 		segmentNum -= 20;
+		glClearColor(0.0, 0.0, 0.2, 1);
 	}
 	glFlush();
+}
+
+void keyEvent(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+		case ' ':
+			if (paused == false && started && !won && !lost)
+			{
+				glClearColor(0, 0, 0, 1);
+				paused = true;
+			}
+			else if (!won && !lost && started)
+			{
+				glClearColor(0.15, 0.15, 0.15, 1);
+				paused = false;
+			}
+			break;
+		case 'r':
+			started = false;
+			reset = true;
+			winNum = 0;
+			won = false;
+			lost = false;
+			segmentNum = 50;
+			break;
+		case 27:
+			exit(0);
+			break;
+	}
 }
 
 /*void idle()
@@ -138,6 +177,7 @@ void startGame(int button, int state, int x, int y)
 		glutDisplayFunc(myDisplayCallback2);		// register a callback
 		glutPassiveMotionFunc(shipMove); //Mouse movement moves ship
 		glutMouseFunc(mouseClick); //Left click shoots bomb
+		glutKeyboardFunc(keyEvent);
 		//glutIdleFunc(idle);
 		glutMainLoop();							// get into an infinite loop
 	}

@@ -30,7 +30,9 @@ Grid *g = new Grid(-288, -288, 288, 288); //Display grid
 Bomb *b = new Bomb();
 Ship *s = new Ship(shipStip, shipX, shipY);
 Centipede *Cent = new Centipede(segmentNum);
-mushrooms *mushmush = new mushrooms();
+mushrooms *mushmush = new mushrooms(winNum + 2);
+double angle = 5*pi / 6;
+int textTimer = 0;
 
 //***********************************************************************************
 
@@ -46,12 +48,14 @@ void splashScreen()
 
 void playGame()
 {
+	//won = true;
+	//winNum = 4;
 	if (reset)
 	{
-		cout << winNum << " " << segmentNum << endl;
+		glClearColor(0.15, 0.15, 0.15, 1);
 		g = new Grid(-288, -288, 288, 288); //Display grid
 		Cent = new Centipede(segmentNum);
-		mushmush = new mushrooms();
+		mushmush = new mushrooms(winNum + 2);
 		b = new Bomb();
 		bombShot = false;
 		hit = false;
@@ -60,7 +64,7 @@ void playGame()
 		reset = false;
 	}
 	//lost = true;
-	if (!lost && !won)
+	if (!lost && !won && started && !paused)
 	{
 		g->drawGrid(); //Display grid
 		mushmush->create();
@@ -120,24 +124,32 @@ void playGame()
 			winNum++;
 		}
 	}
+	else if (!started)
+	{
+		displayInstr();
+	}
 	else if (lost)
 	{
 		winNum = 0;
 		segmentNum = 50;
-		displayLoss(skullPic);
+		displayLoss(skullPic, angle);
 	}
-	else
+	else if (won == true)
 	{
 		if (winNum <= 3)
 		{
-			displayWin();
+			displayWin(levelPic);
 		}
 		else
 		{
 			//winNum = 0;
 			//segmentNum = 50;
-			displayFinish();
+			displayFinish(winPic);
 		}
+	}
+	else if (paused == true)
+	{
+		displayPause();
 	}
 	
 }
@@ -156,12 +168,12 @@ void myDisplayCallback()
 
 void myDisplayCallback2()
 {
-	timer = clock();
+	//timer = clock();
 	glClear(GL_COLOR_BUFFER_BIT);
 	playGame();
 	//glFlush();
 	glutSwapBuffers();
-	//Sleep(1);
+	Sleep(2);
 	glutPostRedisplay(); //Run program in infinite loop
 }
 
@@ -181,7 +193,7 @@ void myInit()
 }
 void myInit2()
 {
-	glClearColor(0.0, 0.0, 0.5, 1);
+	glClearColor(0.15, 0.15, 0.15, 1);
 	//glClearColor(0.75, 0, 1, 0);			// specify a background clor: white 
 	gluOrtho2D(-300, 300, -300, 300);  // specify a viewing area
 }
@@ -204,8 +216,10 @@ void main(int argc, char ** argv)
 	openImg2();
 	openImg3();
 	openImg4();
-	myInit();									// setting up
-
+	openImg5();
+	openImg6();
+	myInit();								// setting up
+	srand(time(NULL));
 	glutDisplayFunc(myDisplayCallback);		// register a callback
 	glutMouseFunc(startGame);
 	glutMainLoop();							// get into an infinite loop

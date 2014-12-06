@@ -17,29 +17,32 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 #include "variables.h"
 #include <vector>
 
-void displayLoss(GLfloat pixMap[][300][4]);
-void displayWin();
-void displayFinish();
+void displayLoss(GLfloat pixMap[][300][4], double angleStart);
+void displayWin(GLfloat pixMap[][450][4]);
+void displayFinish(GLfloat pixMap[][300][4]);
+void displayInstr();
+void displayPause();
 
 struct flocations
 {
 	double mX;
 	double mY;
-	bool used;
+	bool visible;
+	bool inContact;
 };
 class mushrooms
 {
 private:
 	vector<flocations*> field;
+	int maxMush;
 
 public:
-	mushrooms(double minX = -240, double minY = -192, double maxX = 240, double maxY = 240)
+	mushrooms(int maximum = 2, double minX = -264, double minY = -192, double maxX = 264, double maxY = 240)
 	{
-
-		srand(time(NULL));
 		bool t = false;
 		bool gVal = false;
 		unsigned int Fsize;
+		maxMush = maximum;
 
 		flocations *first = new flocations();
 		first->mX = 216;
@@ -54,11 +57,13 @@ public:
 			Fsize = field.size();
 
 
-			for (int x = 0; x < 2; x++)
+			for (int x = 0; x < maxMush; x++)
 			{
 
-				double rFactor = (rand() % 10) * 24;
+				double rFactor = (rand() % 11) * 24;
 				flocations *ty = new flocations();
+				ty->visible = true;
+				ty->inContact = false;
 				if (t)
 				{
 					ty->mX = rFactor;
@@ -101,18 +106,38 @@ public:
 
 
 	}
+
+	flocations* mushpointer(int lock)
+	{
+
+		return field[lock];
+	}
+
 	void create()
 	{
+		double r = 0;
+		double g = 0;
+		double b = 0;
+		while (r < 0.9 && g < 0.9 && b < 0.9)
+		{
+			r = (double)rand() / RAND_MAX;
+			g = (double)rand() / RAND_MAX;
+			b = (double)rand() / RAND_MAX;
+			//cout << r << " " << g << " " << b << endl;
+		}
 		for (unsigned int i = 0; i < field.size(); ++i)
 		{
-			draw(field[i]->mX, field[i]->mY);
+			if (field[i]->visible)
+			{
+				draw(field[i]->mX, field[i]->mY, r, g, b);
+			}
 		}
 	}
 
-	void draw(double x, double y)
+	void draw(double x, double y, double r, double g, double b)
 	{
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glColor3f(1, 0.5, 1);
+		glColor3f(r, g, b);
 		glRasterPos2i(x, y);
 		glBitmap(24, 24, 0.0, 0.0, 0.0, 0.0, mushroompattern2);
 	}
@@ -128,11 +153,11 @@ public:
 		{
 			int mX = field[i]->mX;
 			int mY = field[i]->mY;
-			if ((mX < x + 48 && mX > x - 24)\
-				|| mX + 24 < x + 48 && mX + 24 > x - 24)
+			if ((mX <= x + 48 && mX >= x - 24)\
+				|| mX + 24 <= x + 48 && mX + 24 >= x - 24)
 			{
-				if ((mY < y + 48 && mY > y - 24)\
-					|| (mY + 24 < y + 48 && mY + 24 > y - 24))
+				if ((mY <= y + 48 && mY >= y - 24)\
+					|| (mY + 24 <= y + 48 && mY + 24 >= y - 24))
 				{
 					result = true;
 				}
@@ -147,13 +172,13 @@ public:
 		{
 			int mX = field[i]->mX;
 			int mY = field[i]->mY;
-			if ((mX < x + 48 && mX > x - 24)\
-				|| mX + 24 < x + 48 && mX + 24 > x - 24)
+			if ((mX <= x + 48 && mX >= x - 24)\
+				|| mX + 24 <= x + 48 && mX + 24 >= x - 24)
 			{
-				if ((mY < y + 48 && mY > y - 24)\
-					|| (mY + 24 < y + 48 && mY + 24 > y - 24))
+				if ((mY <= y + 48 && mY >= y - 24)\
+					|| (mY + 24 <= y + 48 && mY + 24 >= y - 24))
 				{
-					field.erase(field.begin() + i);
+					field[i]->visible = false;
 				}
 			}
 		}
@@ -167,6 +192,14 @@ public:
 	int getY(int i)
 	{
 		return field[i]->mY;
+	}
+	bool isVisible(flocations* mm)
+	{
+		return mm->visible;
+	}
+	bool isInContact(flocations* mm)
+	{
+		return mm->inContact;
 	}
 
 
@@ -186,6 +219,8 @@ private:
 	bool MoveLeft;
 	int linelocation;
 	int segNum;
+	bool head;
+	bool tail;
 public:
 	Segments(double x, double y, int segs) {
 		minxlocation = x;
@@ -194,6 +229,24 @@ public:
 		DrawDisplay = false;
 		MoveLeft = false;
 		linelocation = 0;
+		head = false;
+		tail = false;
+	}
+	bool IsHead()
+	{
+		return head;
+	}
+	void SetH()
+	{
+		head = true;
+	}
+	bool IsTail()
+	{
+		return tail;
+	}
+	void SetT()
+	{
+		tail = true;
 	}
 	//Just Draws Segments
 	void draw()
@@ -325,6 +378,14 @@ public:
 		for (int i = 0; i < NumOfSegments; i++)
 		{
 			Segments *Y = new Segments(startX, startY, segNum);
+			if (i == 0)
+			{
+				Y->SetH();
+			}
+			if (i == NumOfSegments - 1)
+			{
+				Y->SetT();
+			}
 			body.push_back(Y);
 			startX = startX - 23;
 
@@ -430,14 +491,26 @@ public:
 
 	}
 
+	void EnterMushroom(flocations* hitMush)
+	{
+
+		hitMush->inContact = true;
+
+	}
+	void LeaveMushroom(flocations* hitMush)
+	{
+
+		hitMush->inContact = false;
+	}
+
 	//Move Down Method
 	void movedown(Segments* ut)
 	{
 		double u = 0.0;
-		while (u < 23.6)
+		while (u < 24)
 		{
-			ut->moveSegment(0, 0.8);
-			u = u + 0.8;
+			ut->moveSegment(0, 1);
+			u = u + 1;
 		}
 		ut->IncLineLocation();
 		ut->SetMLeft();
@@ -459,9 +532,26 @@ public:
 				{
 					if (mush->mX + 24 >= ut->centerX() - 12 && mush->mX <= ut->centerX() - 12)
 					{
-						if (mush->mY + 24 > ut->centerY() && mush->mY < ut->centerY())
+						if (mush->mY + 24 >= ut->centerY() && mush->mY <= ut->centerY())
 						{
-							set = true;
+							if (ut->IsHead() && mush->visible)
+							{
+								EnterMushroom(mush);
+								set = true;
+							}
+							else if (ut->IsTail() && mush->inContact)
+							{
+								LeaveMushroom(mush);
+								set = true;
+							}
+							else if (mush->inContact)
+							{
+								set = true;
+							}
+							else
+							{
+								set = false;
+							}
 						}
 					}
 				}
@@ -481,9 +571,26 @@ public:
 					//11.8 12.2
 					if (mush->mX <= ut->centerX() + 12 && mush->mX + 24 >= ut->centerX() + 12)
 					{
-						if (mush->mY +24 > ut->centerY() && mush->mY < ut->centerY())
+						if (mush->mY +24 >= ut->centerY() && mush->mY <= ut->centerY())
 						{
-							set = true;
+							if (ut->IsHead() && mush->visible)
+							{
+								EnterMushroom(mush);
+								set = true;
+							}
+							else if (ut->IsTail() && mush->inContact)
+							{
+								LeaveMushroom(mush);
+								set = true;
+							}
+							else if (mush->inContact)
+							{
+								set = true;
+							}
+							else
+							{
+								set = false;
+							}
 						}
 					}
 
@@ -499,11 +606,11 @@ public:
 		bool result = false;
 		for (int i = 0; i < NumOfSegments; i++)
 		{
-			if ((body[i]->centerX() - 12 > bX - 24 && body[i]->centerX() - 12 < bX + 48)\
-				|| (body[i]->centerX() + 12 > bX - 24 && body[i]->centerX() + 12 < bX + 48))
+			if ((body[i]->centerX() - 12 >= bX - 24 && body[i]->centerX() - 12 <= bX + 48)\
+				|| (body[i]->centerX() + 12 >= bX - 24 && body[i]->centerX() + 12 <= bX + 48))
 			{
-				if ((body[i]->centerY() - 12 > bY - 24 && body[i]->centerY() - 12 < bY + 48)\
-					|| (body[i]->centerY() + 12 > bY - 24 && body[i]->centerY() + 12 < bY + 48))
+				if ((body[i]->centerY() - 12 >= bY - 24 && body[i]->centerY() - 12 <= bY + 48)\
+					|| (body[i]->centerY() + 12 >= bY - 24 && body[i]->centerY() + 12 <= bY + 48))
 				{
 					result = true;
 				}
@@ -517,6 +624,7 @@ public:
 		{
 			body.pop_back();
 			NumOfSegments--;
+			body[body.size() - 1]->SetT();
 		}
 		else
 		{
@@ -613,11 +721,11 @@ public:
 		{
 			int cX = c->getSegX(i);
 			int cY = c->getSegY(i);
-			if ((cX - 12 < xLoc + 25 && cX - 12 > xLoc - 5)\
-				|| cX + 12 < xLoc + 25 && cX + 12 > xLoc - 5)
+			if ((cX - 12 <= xLoc + 25 && cX - 12 >= xLoc - 5)\
+				|| cX + 12 <= xLoc + 25 && cX + 12 >= xLoc - 5)
 			{
-				if ((cY - 12 < yLoc + 40 && cY - 12 > yLoc)\
-					|| (cY + 12 < yLoc + 40 && cY + 12 > yLoc))
+				if ((cY - 12 <= yLoc + 40 && cY - 12 >= yLoc)\
+					|| (cY + 12 <= yLoc + 40 && cY + 12 >= yLoc))
 				{
 					result = true;
 				}
@@ -666,11 +774,11 @@ public:
 		{
 			int cX = c->getSegX(i);
 			int cY = c->getSegY(i);
-			if ((cX - 12 < bombX + 24 && cX - 12 > bombX)\
-				|| cX + 12 < bombX + 24 && cX + 12 > bombX)
+			if ((cX - 12 <= bombX + 24 && cX - 12 >= bombX)\
+				|| cX + 12 <= bombX + 24 && cX + 12 >= bombX)
 			{
-				if ((cY - 12 < bombY + 24 && cY - 12 > bombY)\
-					|| (cY + 12 < bombY + 24 && cY + 12 > bombY))
+				if ((cY - 12 <= bombY + 24 && cY - 12 >= bombY)\
+					|| (cY + 12 <= bombY + 24 && cY + 12 >= bombY))
 				{
 					result = true;
 				}
@@ -686,13 +794,16 @@ public:
 		{
 			int mX = m->getX(i);
 			int mY = m->getY(i);
-			if ((mX < xLoc + 24 && mX > xLoc)\
-				|| mX + 24 < xLoc + 24 && mX + 24 > xLoc)
+			if ((mX <= xLoc + 24 && mX >= xLoc)\
+				|| mX + 24 <= xLoc + 24 && mX + 24 >= xLoc)
 			{
-				if ((mY < yLoc + 24 && mY > yLoc)\
-					|| (mY + 24 < yLoc + 24 && mY + 24 > yLoc))
+				if ((mY <= yLoc + 24 && mY >= yLoc)\
+					|| (mY + 24 <= yLoc + 24 && mY + 24 >= yLoc))
 				{
-					result = true;
+					if (m->isVisible(m->mushpointer(i)))
+					{
+						result = true;
+					}
 				}
 			}
 		}
@@ -702,11 +813,11 @@ public:
 	bool killed(int sX, int sY)
 	{
 		bool result = false;
-		if ((sX - 5 > xLoc - 24 && sX + 25 < xLoc + 48)\
-			|| (sX - 5 > xLoc - 24 && sX + 25 + 12 < xLoc + 48))
+		if ((sX - 5 >= xLoc - 24 && sX + 25 <= xLoc + 48)\
+			|| (sX - 5 >= xLoc - 24 && sX + 25 + 12 <= xLoc + 48))
 		{
-			if ((sY + 40 > yLoc - 24 && sY + 40 < yLoc + 48)\
-				|| (sY > yLoc - 24 && sY + 12 < yLoc + 48))
+			if ((sY + 40 >= yLoc - 24 && sY + 40 <= yLoc + 48)\
+				|| (sY >= yLoc - 24 && sY + 12 <= yLoc + 48))
 			{
 				result = true;
 			}

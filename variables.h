@@ -37,6 +37,9 @@ extern int winNum;
 extern bool lost;
 extern bool won;
 extern bool reset;
+extern bool started;
+extern bool paused;
+extern double angle;
 extern clock_t timer;
 double d;//initializing variable
 const double pi = 3.14159265; //pi constant
@@ -45,6 +48,8 @@ extern GLfloat picture[159][318][3]; //Centipede picture pixel map
 extern GLfloat bombPic[24][24][4]; //Bomb pixel map (transparent background)
 extern GLfloat explosionPic[72][72][4]; //Explosion pixel map (transparent background)
 extern GLfloat skullPic[300][300][4];
+extern GLfloat levelPic[238][450][4];
+extern GLfloat winPic[230][300][4];
 const GLfloat xcor1 = -130.0;
 const GLfloat ycor1 = 100.0;
 bool saved = false;
