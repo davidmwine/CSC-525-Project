@@ -1,14 +1,30 @@
 /*==================================================================================================
-PROGRAMMER:			David Wine, Joshua Stark
-COURSE:				CSC 525/625
+PROGRAMMER:				David Wine, Joshua Stark
+COURSE:					CSC 525/625
+FOLDER IDS:				Wine123, Stark1222
+CONTRIBUTIONS:			David Wine (50%): A large portion of event driven programming,
+							display screens, pixel maps, ship, bomb, grid, splash screen
+							contributions same as homework 3 (largely unchanged), a lot of
+							the code in main display callback for game.
+						Joshua Stark (50%): Centipede, mushrooms, bitmaps, collision detection,
+							3D stroke text, splash screen contributions same as homework 3
+							(largely unchanged)
 MODIFIED BY:			N/A
-LAST MODIFIED DATE:	Oct. 29, 2014
-DESCRIPTION:			Advertisement/Demo for game called Centipede Bomber
-NOTE:					N/A
-FILES:					csc525Project.cpp, splash.cpp, splash.h, variables.h
+LAST MODIFIED DATE:	    Dec. 6, 2014
+DESCRIPTION:			Advertisement/Demo for game called Centipede Bomber. Starts with splash
+							screen, click to go into main window. Main window starts with
+							instructions for how to play, then click again to actually play game.
+							Once playing game there is a center window with actual gameplay, and
+							side panels with a message stating game is a demo. There is also a
+							game lost screen, a next level screen, a win screen, and a pause screen
+NOTES:					Speed will work differently on some computers (mainly those with dedicated
+							graphics cards it seems), centipede movement down can seem a little
+							jagged or disconnected
+FILES:					csc525Project.cpp, splash.cpp, game.cpp, events.cpp,csc525Project.h,
+							splash.h, game.h, events.h, variables.h
 IDE/COMPILER:			MicroSoft Visual Studio 2013
 INSTRUCTION FOR COMPILATION AND EXECUTION:
-1.		Double click on hwProject.sln	to OPEN the project
+1.		Double click on termProject.sln	to OPEN the project
 2.		Press Ctrl+F7					to COMPILE
 3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
 4.		Press Ctrl+F5					to EXECUTE
@@ -18,6 +34,7 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 #include <time.h>
 using namespace std;
 
+//Various booleans and numbers for external use
 extern int mainwindow;
 extern int gamewindow;
 extern int MainWidth;
@@ -40,19 +57,19 @@ extern bool reset;
 extern bool started;
 extern bool paused;
 extern double angle;
-extern clock_t timer;
 double d;//initializing variable
 const double pi = 3.14159265; //pi constant
-size_t countup;
+const GLfloat xcor1 = -130.0;
+const GLfloat ycor1 = 100.0;
+
+//Pixel maps
 extern GLfloat picture[159][318][3]; //Centipede picture pixel map
 extern GLfloat bombPic[24][24][4]; //Bomb pixel map (transparent background)
 extern GLfloat explosionPic[72][72][4]; //Explosion pixel map (transparent background)
-extern GLfloat skullPic[300][300][4];
-extern GLfloat levelPic[238][450][4];
-extern GLfloat winPic[230][300][4];
-const GLfloat xcor1 = -130.0;
-const GLfloat ycor1 = 100.0;
-bool saved = false;
+extern GLfloat skullPic[300][300][4]; //Skull pixel map
+extern GLfloat levelPic[238][450][4]; //Level up pixel map
+extern GLfloat winPic[230][300][4]; //You win pixel map
+
 //24 BITMAP PATTERN
 GLubyte mushroompattern2[] = { 
 0x00, 0x00, 0x00,
@@ -117,6 +134,8 @@ GLubyte mushroompattern[] = { 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00,//Next 4
 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00 }; //Bitmap to draw mushrooms
+
+//Stipple for ship
 GLubyte shipStip[] = {
 	0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77,
 	0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA,
@@ -133,4 +152,4 @@ GLubyte shipStip[] = {
 	0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77,
 	0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA,
 	0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77,
-	0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA }; //Stipple for ship
+	0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA, 0x77, 0xAA };

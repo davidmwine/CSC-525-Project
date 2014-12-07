@@ -1,14 +1,30 @@
 /*==================================================================================================
-PROGRAMMER:			David Wine, Joshua Stark
-COURSE:				CSC 525/625
+PROGRAMMER:				David Wine, Joshua Stark
+COURSE:					CSC 525/625
+FOLDER IDS:				Wine123, Stark1222
+CONTRIBUTIONS:			David Wine (50%): A large portion of event driven programming,
+							display screens, pixel maps, ship, bomb, grid, splash screen
+							contributions same as homework 3 (largely unchanged), a lot of
+							the code in main display callback for game.
+						Joshua Stark (50%): Centipede, mushrooms, bitmaps, collision detection,
+							3D stroke text, splash screen contributions same as homework 3
+							(largely unchanged)
 MODIFIED BY:			N/A
-LAST MODIFIED DATE:	Oct. 29, 2014
-DESCRIPTION:			Advertisement/Demo for game called Centipede Bomber
-NOTE:					N/A
-FILES:					csc525Project.cpp, splash.cpp, splash.h, variables.h
+LAST MODIFIED DATE:	    Dec. 6, 2014
+DESCRIPTION:			Advertisement/Demo for game called Centipede Bomber. Starts with splash
+							screen, click to go into main window. Main window starts with
+							instructions for how to play, then click again to actually play game.
+							Once playing game there is a center window with actual gameplay, and
+							side panels with a message stating game is a demo. There is also a
+							game lost screen, a next level screen, a win screen, and a pause screen
+NOTES:					Speed will work differently on some computers (mainly those with dedicated
+							graphics cards it seems), centipede movement down can seem a little
+							jagged or disconnected
+FILES:					csc525Project.cpp, splash.cpp, game.cpp, events.cpp,csc525Project.h,
+							splash.h, game.h, events.h, variables.h
 IDE/COMPILER:			MicroSoft Visual Studio 2013
 INSTRUCTION FOR COMPILATION AND EXECUTION:
-1.		Double click on hwProject.sln	to OPEN the project
+1.		Double click on termProject.sln	to OPEN the project
 2.		Press Ctrl+F7					to COMPILE
 3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
 4.		Press Ctrl+F5					to EXECUTE
@@ -33,7 +49,7 @@ GLfloat winPic[230][300][4];
 void openImg()
 {
 	ifstream file; //Create an ifstream to run through file
-	file.open("C:\\TEMP\\centipede.bin", ios::in | ios::binary);
+	file.open("C:\\TEMP\\centipede.bin", ios::in | ios::binary); //Open centipede file
 	float readNum;
 	int i = 0; //Counter to determine where to place values in array
 	int j = 0;
@@ -52,7 +68,6 @@ void openImg()
 				j = 0;
 				i++;
 			}
-			//std::cout << "i is: " << i << ", j is: " << j << std::endl;
 			picture[i][j][color] = readNum; //Insert pixel
 			color++;
 		}
@@ -67,7 +82,7 @@ void openImg()
 void openImg2()
 {
 	ifstream file; //Create an ifstream to run through file
-	file.open("C:\\TEMP\\bomb.bin", ios::in | ios::binary);
+	file.open("C:\\TEMP\\bomb.bin", ios::in | ios::binary); //Open bomb file
 	float readNum;
 	int i = 0; //Counter to determine where to place values in array
 	int j = 0;
@@ -86,7 +101,6 @@ void openImg2()
 				j = 0;
 				i++;
 			}
-			//std::cout << "i is: " << i << ", j is: " << j << std::endl;
 			bombPic[i][j][color] = readNum; //Insert pixel
 			color++;
 		}
@@ -95,14 +109,14 @@ void openImg2()
 	else
 	{//If file wasn't open display error message
 		cout << "File not found. Make sure the file bomb.bin is in TEMP.\n";
-		exit(0);
+		exit(0); //Game unplayable without file
 	}
 }
 
 void openImg3()
 {
 	ifstream file; //Create an ifstream to run through file
-	file.open("C:\\TEMP\\explosion.bin", ios::in | ios::binary);
+	file.open("C:\\TEMP\\explosion.bin", ios::in | ios::binary); //Open explosion file
 	float readNum;
 	int i = 0; //Counter to determine where to place values in array
 	int j = 0;
@@ -130,14 +144,14 @@ void openImg3()
 	else
 	{//If file wasn't open display error message
 		cout << "File not found. Make sure the file explosion.bin is in TEMP.\n";
-		exit(0);
+		exit(0); //Game unplayable without file
 	}
 }
 
 void openImg4()
 {
 	ifstream file; //Create an ifstream to run through file
-	file.open("C:\\TEMP\\8bitskull.bin", ios::in | ios::binary);
+	file.open("C:\\TEMP\\8bitskull.bin", ios::in | ios::binary); //Open skull file
 	float readNum;
 	int i = 0; //Counter to determine where to place values in array
 	int j = 0;
@@ -156,7 +170,6 @@ void openImg4()
 				j = 0;
 				i++;
 			}
-			//std::cout << "i is: " << i << ", j is: " << j << std::endl;
 			skullPic[i][j][color] = readNum; //Insert pixel
 			color++;
 		}
@@ -164,15 +177,14 @@ void openImg4()
 	}
 	else
 	{//If file wasn't open display error message
-		cout << "File not found. Make sure the file explosion.bin is in TEMP.\n";
-		exit(0);
+		cout << "File not found. Make sure the file 8bitskull.bin is in TEMP.\n";
 	}
 }
 
 void openImg5()
 {
 	ifstream file; //Create an ifstream to run through file
-	file.open("C:\\TEMP\\level_up.bin", ios::in | ios::binary);
+	file.open("C:\\TEMP\\level_up.bin", ios::in | ios::binary); //Open level up file
 	float readNum;
 	int i = 0; //Counter to determine where to place values in array
 	int j = 0;
@@ -191,7 +203,6 @@ void openImg5()
 				j = 0;
 				i++;
 			}
-			//std::cout << "i is: " << i << ", j is: " << j << std::endl;
 			levelPic[i][j][color] = readNum; //Insert pixel
 			color++;
 		}
@@ -199,15 +210,14 @@ void openImg5()
 	}
 	else
 	{//If file wasn't open display error message
-		cout << "File not found. Make sure the file explosion.bin is in TEMP.\n";
-		exit(0);
+		cout << "File not found. Make sure the file level_up.bin is in TEMP.\n";
 	}
 }
 
 void openImg6()
 {
 	ifstream file; //Create an ifstream to run through file
-	file.open("C:\\TEMP\\you_win.bin", ios::in | ios::binary);
+	file.open("C:\\TEMP\\you_win.bin", ios::in | ios::binary); //Open you win file
 	float readNum;
 	int i = 0; //Counter to determine where to place values in array
 	int j = 0;
@@ -226,7 +236,6 @@ void openImg6()
 				j = 0;
 				i++;
 			}
-			//std::cout << "i is: " << i << ", j is: " << j << std::endl;
 			winPic[i][j][color] = readNum; //Insert pixel
 			color++;
 		}
@@ -234,8 +243,7 @@ void openImg6()
 	}
 	else
 	{//If file wasn't open display error message
-		cout << "File not found. Make sure the file explosion.bin is in TEMP.\n";
-		exit(0);
+		cout << "File not found. Make sure the file you_win.bin is in TEMP.\n";
 	}
 }
 
@@ -257,7 +265,7 @@ int GetY(int ry, int r, double d, double pi) //Gets a y point from the center of
 }
 
 void displayShip(GLubyte ship[], int startX = -10, int startY = -190)
-{
+{ //Draw ship for splash screen
 	glEnable(GL_POLYGON_STIPPLE);
 	glPolygonStipple(ship); //Draw polygon with pattern
 	glBegin(GL_POLYGON);
@@ -360,11 +368,11 @@ void displayMushroom(GLubyte mushroompattern[])
 	glBitmap(32, 32, 0.0, 0.0, 0.0, 0.0, mushroompattern);
 }
 
-void displayCentipede(double d, double pi, size_t countup)
+void displayCentipede(double d, double pi)
 {
 	//Draw Circle 
 	srand(time(NULL));//Seeding Random Value for Legs
-	countup = 0; //Counter for draw events
+	size_t countup = 0; //Counter for draw events
 
 	/*Draws Circle for Centipede Body to Rotate around*/
 	for (d = 0.1 * pi; d <= 2 * pi; d += 0.004) //Incrementing slowly around Radius
